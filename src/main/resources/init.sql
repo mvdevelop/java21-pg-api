@@ -2,7 +2,8 @@
 CREATE DATABASE api_db;
 
 -- Conectar ao banco de dados
-\c api_db;
+-- \c api_db;
+USE api_db;
 
 -- Criar tabela de produtos (se não usar o ddl-auto: update)
 CREATE TABLE IF NOT EXISTS produtos (

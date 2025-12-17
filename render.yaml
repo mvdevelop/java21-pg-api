@@ -1,0 +1,22 @@
+
+# render.yaml - na raiz do projeto
+services:
+  - type: web
+    name: api-java21
+    runtime: docker
+    plan: free
+    branch: main
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: DB_PASSWORD
+        generateValue: true
+    healthCheckPath: /actuator/health
+    autoDeploy: true
+
+databases:
+  - name: postgres-db
+    databaseName: api_db
+    user: postgres
+    plan: free
+    

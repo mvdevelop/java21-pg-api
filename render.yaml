@@ -1,22 +1,24 @@
 
-# render.yaml - na raiz do projeto
 services:
   - type: web
     name: api-java21
     runtime: docker
     plan: free
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
     branch: main
     envVars:
       - key: SPRING_PROFILES_ACTIVE
         value: prod
-      - key: DB_PASSWORD
-        generateValue: true
+      - key: JAVA_OPTS
+        value: "-Xmx256m -Xms128m -XX:+UseContainerSupport"
     healthCheckPath: /actuator/health
+    #healthCheckTimeout: 120  # Aumentar timeout
     autoDeploy: true
 
 databases:
-  - name: postgres-db
-    databaseName: api_db
-    user: postgres
+  - name: api-db
+    databaseName: api_db_5fzl
+    user: api_db_5fzl_user
     plan: free
     

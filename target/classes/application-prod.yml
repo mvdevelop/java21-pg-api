@@ -1,0 +1,41 @@
+
+# Otimizações para iniciar mais rápido
+spring:
+  main:
+    lazy-initialization: true  # Inicialização preguiçosa
+    banner-mode: off
+  
+  datasource:
+    hikari:
+      connection-timeout: 30000
+      initialization-fail-timeout: 0
+      
+  jpa:
+    open-in-view: false  # Remove warning e melhora performance
+    properties:
+      hibernate:
+        # Otimizações
+        jdbc:
+          batch_size: 20
+        order_inserts: true
+        order_updates: true
+        # Remove dialect explícito (causa warning)
+        # dialect: org.hibernate.dialect.PostgreSQLDialect
+
+# Server
+server:
+  port: 8080
+  tomcat:
+    connection-timeout: 30000
+    threads:
+      max: 50
+      min-spare: 5
+
+# Logging simplificado
+logging:
+  level:
+    root: WARN
+    org.springframework: WARN
+    com.exemplo.api: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"

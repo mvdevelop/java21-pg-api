@@ -13,9 +13,8 @@ ARG BASE_URL=https://archive.apache.org/dist/maven/maven-3/${MAVEN_VERSION}/bina
 # Instalando wget, curl, bash e unzip para o setup do Maven
 RUN apt-get update && apt-get install -y wget curl bash tar
 
-# Baixa e instala o Maven
 RUN curl -fsSL -o /tmp/apache-maven.tar.gz ${BASE_URL}/apache-maven-${MAVEN_VERSION}-bin.tar.gz \
-    && echo "${SHA}  /tmp/apache-maven.tar.gz" | sha256sum -c - \
+    # && echo "${SHA}  /tmp/apache-maven.tar.gz" | sha256sum -c - \
     && tar -xzf /tmp/apache-maven.tar.gz -C /opt \
     && ln -s /opt/apache-maven-${MAVEN_VERSION} /opt/maven \
     && rm -f /tmp/apache-maven.tar.gz

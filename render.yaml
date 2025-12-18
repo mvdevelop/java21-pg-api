@@ -1,4 +1,3 @@
-
 services:
   - type: web
     name: api-java21
@@ -11,10 +10,10 @@ services:
       - key: SPRING_PROFILES_ACTIVE
         value: prod
       - key: JAVA_OPTS
-        value: "-Xmx256m -Xms128m -XX:+UseContainerSupport"
-    healthCheckPath: /actuator/health
-    #healthCheckTimeout: 120  # Aumentar timeout
+        value: "-Xmx256m -Xms128m -XX:+UseContainerSupport -Djava.security.egd=file:/dev/./urandom"
+    healthCheckPath: /health
     autoDeploy: true
+    # NÃO use healthCheckTimeout aqui
 
 databases:
   - name: api-db

@@ -2,36 +2,39 @@
 #!/bin/sh
 
 # Configurações para Render
-export JAVA_OPTS="-Xmx256m -Xms128m -XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -Djava.security.egd=file:/dev/./urandom"
+export JAVA_OPTS="${JAVA_OPTS} -Dspring.main.lazy-initialization=true -Dspring.main.web-application-type=servlet"
 
-# Converter DATABASE_URL do Render se existir
-if [ -n "$DATABASE_URL" ]; then
-  # Formato: postgresql://user:password@host:port/database
-  # Remover protocolo
-  DB_CONN=${DATABASE_URL#postgresql://}
-  
-  # Extrair componentes
-  USER_PASS=$(echo $DB_CONN | cut -d'@' -f1)
-  HOST_DB=$(echo $DB_CONN | cut -d'@' -f2)
-  
-  USERNAME=$(echo $USER_PASS | cut -d':' -f1)
-  PASSWORD=$(echo $USER_PASS | cut -d':' -f2)
-  
-  HOST=$(echo $HOST_DB | cut -d'/' -f1)
-  DATABASE=$(echo $HOST_DB | cut -d'/' -f2)
-  
-  # Adicionar porta padrão se não tiver
-  if [[ ! $HOST =~ :[0-9]+$ ]]; then
-    HOST="${HOST}:5432"
-  fi
-  
-  export SPRING_DATASOURCE_URL="jdbc:postgresql://${HOST}/${DATABASE}"
-  export SPRING_DATASOURCE_USERNAME="${USERNAME}"
-  export SPRING_DATASOURCE_PASSWORD="${PASSWORD}"
-  
-  echo "Database configured from DATABASE_URL"
-fi
+# Iniciar aplicação em background
+echo "🚀 Iniciando aplicação Spring Boot..."
+java $JAVA_OPTS -jar app.jar --server.port=8080 --spring.profiles.active=${SPRING_PROFILES_ACTIVE:-prod} &
 
-# Iniciar aplicação na porta 8080
-echo "Starting application on port 8080..."
-exec java $JAVA_OPTS -jar app.jar --server.port=8080 --spring.profiles.active=${SPRING_PROFILES_ACTIVE:-prod}
+# Guardar PID
+APP_PID=$!
+
+# Aguardar startup
+echo "⏳ Aguardando aplicação iniciar (máx 90s)..."
+
+# Tentar health check por até 90 segundos
+for i in $(seq 1 90); do
+    if curl -s -f http://localhost:8080/health > /dev/null 2>&1; then
+        echo "✅ Aplicação iniciada e respondendo!"
+        echo "📡 Disponível em: http://localhost:8080"
+        echo "🔧 PID: $APP_PID"
+        
+        # Manter container rodando
+        wait $APP_PID
+        exit $?
+    fi
+    
+    # Verificar se processo ainda está vivo
+    if ! kill -0 $APP_PID 2>/dev/null; then
+        echo "❌ Processo da aplicação morreu"
+        exit 1
+    fi
+    
+    sleep 1
+done
+
+echo "❌ Timeout: Aplicação não respondeu após 90 segundos"
+kill $APP_PID
+exit 1

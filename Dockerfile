@@ -7,15 +7,19 @@ RUN apk add --no-cache maven && mvn clean package -DskipTests
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 
-# Copiar JAR
+# Instalar curl para health check interno
+RUN apk add --no-cache curl
+
 COPY --from=build /app/target/*.jar app.jar
 
-# Render usa variável PORT, default 10000 mas podemos forçar 8080
-ENV PORT=8080
-EXPOSE $PORT
+# Script de entrada com health check
+COPY start.sh /start.sh
+RUN chmod +x /start.sh
 
-# Otimizações JVM para iniciar mais rápido
-ENV JAVA_OPTS="-Xmx256m -Xms128m -XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -Djava.security.egd=file:/dev/./urandom"
+EXPOSE 8080
 
-# Forçar porta 8080
-ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar --server.port=8080 --spring.profiles.active=${SPRING_PROFILES_ACTIVE}"]
+# Health check interno do container
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+  CMD curl -f http://localhost:8080/health || exit 1
+
+ENTRYPOINT ["/start.sh"]

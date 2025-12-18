@@ -1,5 +1,4 @@
 
-// src/main/java/com/exemplo/api/controller/HealthController.java
 package com.exemplo.api.controller;
 
 import org.springframework.http.ResponseEntity;
@@ -16,6 +15,6 @@ public class HealthController {
     
     @GetMapping("/")
     public ResponseEntity<String> home() {
-        return ResponseEntity.ok("API Java 21 is running");
+        return ResponseEntity.ok("API Java 21 - Status: ONLINE");
     }
 }

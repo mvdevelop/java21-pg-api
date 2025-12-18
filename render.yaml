@@ -3,21 +3,9 @@ services:
     name: api-java21
     runtime: docker
     plan: free
-    dockerfilePath: ./Dockerfile
-    dockerContext: .
     branch: main
     envVars:
       - key: SPRING_PROFILES_ACTIVE
         value: prod
-      - key: JAVA_OPTS
-        value: "-Xmx256m -Xms128m -XX:+UseContainerSupport -Djava.security.egd=file:/dev/./urandom"
     healthCheckPath: /health
     autoDeploy: true
-    # NÃO use healthCheckTimeout aqui
-
-databases:
-  - name: api-db
-    databaseName: api_db_5fzl
-    user: api_db_5fzl_user
-    plan: free
-    

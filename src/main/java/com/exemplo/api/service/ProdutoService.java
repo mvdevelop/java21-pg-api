@@ -2,6 +2,7 @@ package com.exemplo.api.service;
 
 import com.exemplo.api.dto.ProdutoDTO;
 import com.exemplo.api.dto.ProdutoResponseDTO;
+import com.exemplo.api.exception.ResourceNotFoundException;
 import com.exemplo.api.model.Produto;
 import com.exemplo.api.repository.ProdutoRepository;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +12,12 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Service layer for product operations.
+ * Handles business logic between Controller and Repository.
+ *
+ * @author Marco
+ */
 @Service
 @RequiredArgsConstructor
 public class ProdutoService {
@@ -24,7 +31,7 @@ public class ProdutoService {
         produto.setDescricao(dto.getDescricao());
         produto.setPreco(dto.getPreco());
         produto.setQuantidade(dto.getQuantidade());
-        
+
         Produto salvo = produtoRepository.save(produto);
         return toResponseDTO(salvo);
     }
@@ -38,30 +45,32 @@ public class ProdutoService {
 
     public ProdutoResponseDTO buscarPorId(Long id) {
         Produto produto = produtoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        String.format("Produto não encontrado com ID: %d", id)));
         return toResponseDTO(produto);
     }
 
     @Transactional
     public ProdutoResponseDTO atualizarProduto(Long id, ProdutoDTO dto) {
         Produto produto = produtoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
-        
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        String.format("Produto não encontrado com ID: %d", id)));
+
         produto.setNome(dto.getNome());
         produto.setDescricao(dto.getDescricao());
         produto.setPreco(dto.getPreco());
         produto.setQuantidade(dto.getQuantidade());
-        
+
         Produto atualizado = produtoRepository.save(produto);
         return toResponseDTO(atualizado);
     }
 
     @Transactional
     public void deletarProduto(Long id) {
-        if (!produtoRepository.existsById(id)) {
-            throw new RuntimeException("Produto não encontrado");
-        }
-        produtoRepository.deleteById(id);
+        Produto produto = produtoRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        String.format("Produto não encontrado com ID: %d", id)));
+        produtoRepository.delete(produto);
     }
 
     public List<ProdutoResponseDTO> buscarPorNome(String nome) {

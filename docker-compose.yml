@@ -6,9 +6,9 @@ services:
     image: postgres:15-alpine
     container_name: postgres_api
     environment:
-      POSTGRES_DB: api_db
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 123qwe
+      POSTGRES_DB: ${POSTGRES_DB:api_db}
+      POSTGRES_USER: ${POSTGRES_USER:postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:postgres}
     ports:
       - "5432:5432"
     volumes:
@@ -26,6 +26,11 @@ services:
       - "8080:8080"
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/api_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD:postgres}
+      DB_URL: jdbc:postgresql://postgres:5432/api_db
+      DB_USERNAME: postgres
+      DB_PASSWORD: ${DB_PASSWORD:postgres}
       SPRING_PROFILES_ACTIVE: docker
     depends_on:
       postgres:

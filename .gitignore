@@ -1,0 +1,28 @@
+# Build Artifacts
+target/
+*.jar
+*.war
+*.class
+
+# Environment Variables
+.env
+.env.*
+*.env
+!.env.example
+
+# IDE
+.vscode/
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# Maven Wrapper

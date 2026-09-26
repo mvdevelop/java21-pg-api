@@ -1,3 +1,4 @@
+
 services:
   - type: web
     name: api-java21
@@ -7,5 +8,11 @@ services:
     envVars:
       - key: SPRING_PROFILES_ACTIVE
         value: prod
+      - key: DB_PASSWORD
+        fromSecret: db-password
+      - key: DB_USERNAME
+        value: api_db_5fzl_user
+      - key: DB_URL
+        value: jdbc:postgresql://db:5432/api_db
     healthCheckPath: /health
     autoDeploy: true
